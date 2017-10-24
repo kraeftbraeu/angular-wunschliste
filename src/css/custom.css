@@ -1,0 +1,12 @@
+.clickable {
+  cursor: pointer;
+}
+
+.no-hover:hover {
+  background-color: transparent !important;
+}
+
+.badge {
+  background-color: #f5f5f5;
+  color: #333;
+}
