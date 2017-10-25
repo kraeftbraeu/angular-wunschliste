@@ -24,44 +24,26 @@ export class AuthService
     login(username: string, password: string)
     {
         return this.http.post(this.loginServerUrl, JSON.stringify({ user: username, pw: password }), this.restService.getRequestOptions(false))
-                        .map((response: Response) => this.storeNewToken(response));
+                        .map((response: Response) => this.storageHandler.storeNewToken(response, true));
     }
 
     logout()
     {
         // remove user from local storage to log user out
-        this.storageHandler.setNewLogin(null);
+        this.storageHandler.setLoginUser(null, true);
     }
 
     changePassword(newPassword: string)
     {
         return this.http.post(this.pwChangeServerUrl, JSON.stringify({ pw: newPassword }), this.restService.getRequestOptions(false))
-                        .map((response: Response) => this.storeNewToken(response));
-    }
-
-    private storeNewToken(response: Response)
-    {
-        // login/pw change successful if there's a jwt token in the response
-        let newToken = response.json();
-        if (newToken && newToken.token)
-        {
-            // store user details and jwt token in local storage to keep user logged in between page refreshes
-            let decodedJwt = this.jwtService.decodeJwt(JSON.stringify(newToken));
-            let currentUser = new LoginUser();
-            currentUser.id = decodedJwt.u_id;
-            currentUser.username = decodedJwt.u_name;
-            currentUser.token = newToken;
-
-            this.storageHandler.setNewLogin(currentUser);
-        }
-        return newToken;
+                        .map((response: Response) => this.storageHandler.storeNewToken(response, false));
     }
 
     isTokenValid(token: any): boolean
     {
         if(token !== null)
         {
-            let decodedJwt = this.jwtService.decodeJwt(token.token);
+            let decodedJwt = this.jwtService.decodeJwt(token);
             return decodedJwt.exp.valueOf() * 1000 > new Date().valueOf();
         }
         return false;

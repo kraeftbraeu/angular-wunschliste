@@ -1,22 +1,17 @@
-import {Injectable} from '@angular/core';
-import {Http, Response, Headers, RequestOptions} from '@angular/http';
-import {DbObject} from '../data/dbobject';
-import {User} from '../data/user';
-import {Wish} from '../data/wish';
-import {Present} from '../data/present';
-import {StorageHandler} from './localstorage.service';
-import {Observable} from 'rxjs/Rx';
+import { Injectable } from '@angular/core';
+import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import { DbObject } from '../data/dbobject';
+import { User } from '../data/user';
+import { Wish } from '../data/wish';
+import { Present } from '../data/present';
+import { StorageHandler } from './localstorage.service';
+import { environment } from '../../src/environments/environment';
+import { Observable } from 'rxjs/Rx';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
-import { environment } from '../../src/environments/environment';
-
-/*export interface IRestService
-{
-    readWishes(userId: number): Observable<Wish[]>;
-}*/
 
 @Injectable()
-export class RestService //implements IRestService
+export class RestService
 {
     private serverUrl = environment.apiUrl + "api.php/";
     private userTable = "user";
@@ -31,28 +26,28 @@ export class RestService //implements IRestService
     readUsers(): Observable<User[]>
     {
         return this.http.get(this.serverUrl + this.userTable, this.getRequestOptions(true))
-                        .map((response: Response) => response.json().map(res => User.fromJson(res)))
+                        .map((response: Response) => this.extractContent(response).map(res => User.fromJson(res)))
                         .catch(this.handleError);
     }
 
     readWishes(userId: number): Observable<Wish[]>
     {
         return this.http.get(this.serverUrl + this.wishTable + (userId === null ? "/" : "/w_user/" + userId), this.getRequestOptions(true))
-                        .map((response: Response) => response.json().map(res => Wish.fromJson(res)))
+                        .map((response: Response) => this.extractContent(response).map(res => Wish.fromJson(res)))
                         .catch(this.handleError);
     }
 
     readAllPresents(): Observable<Present[]>
     {
         return this.http.get(this.serverUrl + this.presentTable + "/", this.getRequestOptions(true))
-                        .map((response: Response) => response.json().map(res => Present.fromJson(res)))
+                        .map((response: Response) => this.extractContent(response).map(res => Present.fromJson(res)))
                         .catch(this.handleError);
     }
 
     readPresents(userId: number, isForGiver: boolean): Observable<Present[]>
     {
         return this.http.get(this.serverUrl + this.presentTable + (isForGiver ? "/p_giver/" : "/p_wisher/") + userId, this.getRequestOptions(true))
-                        .map((response: Response) => response.json().map(res => Present.fromJson(res)))
+                        .map((response: Response) => this.extractContent(response).map(res => Present.fromJson(res)))
                         .catch(this.handleError);
     }
 
@@ -61,11 +56,11 @@ export class RestService //implements IRestService
     {
         if(dbObject.id <= 0)
             return this.http.post(this.serverUrl + dbObject.getTableName(), dbObject.toJson(), this.getRequestOptions(true))
-                            .map(this.extractData)
+                            .map(this.extractContent)
                             .catch(this.handleError);
         else
             return this.http.put(this.serverUrl + dbObject.getTableName() + "/" + dbObject.id, dbObject.toJson(), this.getRequestOptions(true))
-                            .map(this.extractData)
+                            .map(this.extractContent)
                             .catch(this.handleError);
     }
 
@@ -74,9 +69,10 @@ export class RestService //implements IRestService
         return this.http.delete(this.serverUrl + dbObject.getTableName() + "/" + dbObject.id, this.getRequestOptions(false));
     }
 
-    private extractData(res: Response)
+    private extractContent(res: Response)
     {
-        return res.json() || { };
+        this.storageHandler.storeNewToken(res, false);
+        return res.json().content || { };
     }
 
     private handleError(error: Response | any)
@@ -100,19 +96,19 @@ export class RestService //implements IRestService
     public getRequestOptions(addContentTypeJson: boolean): RequestOptions {
         // create authorization header with jwt token
         let loginUser = this.storageHandler.getCurrentUser();
-        if (loginUser && loginUser.token && loginUser.token.token)
+        if (loginUser && loginUser.token)
         {
             let headers;
             if(addContentTypeJson)
                 headers = new Headers({
                     'Access-Control-Allow-Origin': '*',
-                    'Authorization': loginUser.token.token,
+                    'Authorization': loginUser.token,
                     'Content-Type': 'application/json'
                 });
             else
                 headers = new Headers({
                     'Access-Control-Allow-Origin': '*',
-                    'Authorization': loginUser.token.token
+                    'Authorization': loginUser.token
                 });
             return new RequestOptions({ headers: headers });
         }

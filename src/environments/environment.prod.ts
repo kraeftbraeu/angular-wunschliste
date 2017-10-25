@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://kraemer.bplaced.net/restservice/'
+  apiUrl: 'https://mk2-a.srv.sixhop.net/restservice/'
 };
