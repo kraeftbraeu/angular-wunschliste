@@ -7,19 +7,19 @@
 <div class="panel panel-default">
     <div class="panel-heading">Passwort ändern</div>
     <div class="panel-body">
-        <form name="form" (ngSubmit)="f.form.valid && clickedChangePassword(f)" #f="ngForm" novalidate>
-            <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !newPw1Wl2.valid }">
-                <label for="newPw1Wl2">Neues Passwort</label>
-                <input type="password" class="form-control" name="newPw1Wl2" [(ngModel)]="model.newPw1Wl2" #newPw1Wl2="ngModel" placeholder="Neues Passwort" required />
-                <div *ngIf="f.submitted && !newPw1Wl2.valid" class="help-block">Bitte Passwort angeben</div>
+        <form name="form" (ngSubmit)="clickedChangePassword(pwChangeForm)" [formGroup]="pwChangeForm" novalidate>
+            <div class="form-group" [ngClass]="{ 'has-error': isFormSubmitted && pwChangeForm.get('mpw1').status !== 'VALID' }">
+                <label for="mpw1">Neues Passwort</label>
+                <input type="password" class="form-control" id="mpw1" formControlName="mpw1" placeholder="Neues Passwort" />
+                <div *ngIf="isFormSubmitted && pwChangeForm.get('mpw1').status !== 'VALID'" class="help-block">Bitte Passwort angeben</div>
             </div>
-            <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !newPw2Wl2.valid }">
-                <label for="newPw2Wl2">Wiederholen</label>
-                <input type="password" class="form-control" name="newPw2Wl2" [(ngModel)]="model.newPw2Wl2" #newPw2Wl2="ngModel" placeholder="Wiederholen" required />
-                <div *ngIf="f.submitted && !newPw2Wl2.valid && newPw1Wl2.value !== newPw2Wl2.value" class="help-block">Bitte Passwort wiederholen</div>
+            <div class="form-group" [ngClass]="{ 'has-error': isFormSubmitted && pwChangeForm.get('mpw2').status !== 'VALID' }">
+                <label for="mpw2">Wiederholen</label>
+                <input type="password" class="form-control" id="mpw2" formControlName="mpw2" placeholder="Wiederholen" />
+                <div *ngIf="isFormSubmitted && pwChangeForm.get('mpw2').status !== 'VALID'" class="help-block">Bitte Passwort wiederholen</div>
             </div>
             <div class="form-group">
-                <button [disabled]="loading" class="btn btn-default">Anmelden</button>
+                <button [disabled]="loading" class="btn btn-default">Passwort ändern</button>
                 <img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
             </div>
         </form>

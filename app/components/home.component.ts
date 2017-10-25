@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { NgForm } from '@angular/forms';
+import { FormGroup, FormControl, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 
 import { LoginUser } from '../data/loginUser';
 import { StorageHandler } from '../services/localstorage.service';
@@ -13,9 +13,16 @@ import { AlertService } from '../services/alert.service';
 })
 export class HomeComponent
 {
-    model: any = {};
-    loading = false;
     currentUser: LoginUser;
+    pwChangeForm = new FormGroup({
+        'mpw1': new FormControl("", Validators.required),
+        'mpw2': new FormControl("", [
+            Validators.required,
+            this.equalValuesValidator()
+        ])
+    });
+    isFormSubmitted = false;
+    loading = false;
 
     constructor(
         private route: ActivatedRoute,
@@ -26,11 +33,18 @@ export class HomeComponent
     )
     {}
 
+    private equalValuesValidator(): ValidatorFn
+    {
+        return (control: AbstractControl): {[key: string]: any} => {
+            const isEqual = this.pwChangeForm && this.pwChangeForm.get('mpw1').value === this.pwChangeForm.get('mpw2').value;
+            return isEqual ? null : {'pwsNotEqual': {value: control.value}};
+        };
+    }
+
     ngOnInit()
     {
         this.storageHandler.currentUser.subscribe(
-            currentUser =>
-            {
+            currentUser => {
                 if(currentUser === null)
                 {
                     this.alertService.error("Kein angemeldeter Benutzer gefunden. Bitte neu anmelden.");
@@ -42,19 +56,25 @@ export class HomeComponent
         );
     }
 
-    clickedChangePassword(f: NgForm)
+    clickedChangePassword()
     {
-        this.loading = true;
-        this.authService.changePassword(this.model.newPw1Wl2)
-            .subscribe(
-                data => {
-                    this.alertService.success("Das Ändern des Passworts war erfolgreich.");
-                    this.loading = false;
-                    f.resetForm();
-                },
-                error => {
-                    this.alertService.error(error);
-                    this.loading = false;
-                });
+        this.isFormSubmitted = true;
+        if(this.pwChangeForm.valid)
+        {
+            this.loading = true;
+            this.authService.changePassword(this.pwChangeForm.get('mpw1').value)
+                .subscribe(
+                    data => {
+                        this.alertService.success("Das Ändern des Passworts war erfolgreich.");
+                        this.loading = false;
+                        this.isFormSubmitted = false;
+                        this.pwChangeForm.reset();
+                    },
+                    error => {
+                        this.alertService.error(error);
+                        this.loading = false;
+                        this.isFormSubmitted = false;
+                    });
+        }
     }
 }
