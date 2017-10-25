@@ -21,8 +21,9 @@ export class HomeComponent
             this.equalValuesValidator()
         ])
     });
-    isFormSubmitted = false;
-    loading = false;
+    isDoubleCheckSubmit = false;
+    isToValidate = false;
+    isLoading = false;
 
     constructor(
         private route: ActivatedRoute,
@@ -56,24 +57,39 @@ export class HomeComponent
         );
     }
 
+    clickedDoubleCheckSubmit()
+    {
+        this.isToValidate = true;
+        if(this.pwChangeForm.valid)
+            this.isDoubleCheckSubmit = true;
+    }
+
+    clickedReset()
+    {
+        this.isToValidate = false;
+        this.isDoubleCheckSubmit = false;
+        this.pwChangeForm.reset();
+    }
+
     clickedChangePassword()
     {
-        this.isFormSubmitted = true;
         if(this.pwChangeForm.valid)
         {
-            this.loading = true;
+            this.isLoading = true;
             this.authService.changePassword(this.pwChangeForm.get('mpw1').value)
                 .subscribe(
                     data => {
                         this.alertService.success("Das Ändern des Passworts war erfolgreich.");
-                        this.loading = false;
-                        this.isFormSubmitted = false;
+                        this.isLoading = false;
+                        this.isToValidate = false;
+                        this.isDoubleCheckSubmit = false;
                         this.pwChangeForm.reset();
                     },
                     error => {
                         this.alertService.error(error);
-                        this.loading = false;
-                        this.isFormSubmitted = false;
+                        this.isLoading = false;
+                        this.isToValidate = false;
+                        this.isDoubleCheckSubmit = false;
                     });
         }
     }
