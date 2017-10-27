@@ -6,7 +6,7 @@ import { StorageHandler } from './localstorage.service';
 import { RestService } from './rest.service';
 import { LoginUser } from '../data/loginUser';
 import 'rxjs/add/operator/map'
-import { environment } from '../../src/environments/environment';
+import { environment } from '../../environments/environment';
 
 @Injectable()
 export class AuthService

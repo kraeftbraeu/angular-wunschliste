@@ -5,7 +5,7 @@ import { User } from '../data/user';
 import { Wish } from '../data/wish';
 import { Present } from '../data/present';
 import { StorageHandler } from './localstorage.service';
-import { environment } from '../../src/environments/environment';
+import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs/Rx';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
