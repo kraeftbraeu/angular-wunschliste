@@ -13,6 +13,7 @@ import { AlertService } from '../services/alert.service';
 })
 export class HomeComponent
 {
+    year: number;
     currentUser: LoginUser;
     pwChangeForm = new FormGroup({
         'mpw1': new FormControl("", Validators.required),
@@ -32,7 +33,9 @@ export class HomeComponent
         private authService: AuthService,
         private alertService: AlertService
     )
-    {}
+    {
+        this.year = new Date().getFullYear();
+    }
 
     private equalValuesValidator(): ValidatorFn
     {

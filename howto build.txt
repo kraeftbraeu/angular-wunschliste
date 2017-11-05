@@ -1,0 +1,1 @@
+ng build --app app0 --prod --build-optimizer --environment=prod

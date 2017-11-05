@@ -1,8 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Pacifico);
-@import url(https://fonts.googleapis.com/css?family=Helvetica);
 
 .navbar-brand {
-	font-family: 'Pacifico','Helvetica',Arial,sans-serif;
+	font-family: 'Pacifico',Arial,sans-serif;
 }
 
 .navbar-default,
