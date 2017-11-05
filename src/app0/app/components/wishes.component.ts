@@ -18,6 +18,7 @@ export class WishesComponent {
     oldLink: string;
 
     currentUserId: number;
+    acceptedWishIds: number[];
 
     constructor(
         private restService: RestService,
@@ -39,6 +40,11 @@ export class WishesComponent {
                 this.currentUserId = currentUser.id;
                 this.restService.readWishes(currentUser.id).subscribe(
                     wishes => this.wishes = wishes,
+                    error => this.alertService.error(error)
+                );
+                this.restService.readPresents(currentUser.id, false).subscribe(
+                    presents => this.acceptedWishIds = presents.map(present => present.wishId)
+                                                              .filter(wishId => wishId >= 0),
                     error => this.alertService.error(error)
                 );
             },
@@ -83,13 +89,16 @@ export class WishesComponent {
 
     clickedRemove(index: number, wish: Wish)
     {
-        this.restService.delete(wish).subscribe(
-            result => {
-                console.log('deleted wish#' + wish.id);
-                this.wishes.splice(index, 1);
-            },
-            error => console.error(error)
-        );
+        if(this.acceptedWishIds.indexOf(wish.id) !== -1)
+            this.alertService.error("Dieser Wunsch kann leider nicht mehr gelöscht werden.");
+        else
+            this.restService.delete(wish).subscribe(
+                result => {
+                    console.log('deleted wish#' + wish.id);
+                    this.wishes.splice(index, 1);
+                },
+                error => console.error(error)
+            );
     }
 
     clickedAddNew(event)

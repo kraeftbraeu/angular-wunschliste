@@ -56,11 +56,11 @@ export class RestService
     {
         if(dbObject.id <= 0)
             return this.http.post(this.serverUrl + dbObject.getTableName(), dbObject.toJson(), this.getRequestOptions(true))
-                            .map(this.extractContent)
+                            .map(res => this.extractContentAndUpdateToken(res, this.storageHandler))
                             .catch(this.handleError);
         else
             return this.http.put(this.serverUrl + dbObject.getTableName() + "/" + dbObject.id, dbObject.toJson(), this.getRequestOptions(true))
-                            .map(this.extractContent)
+                            .map(res => this.extractContentAndUpdateToken(res, this.storageHandler))
                             .catch(this.handleError);
     }
 
@@ -71,7 +71,16 @@ export class RestService
 
     private extractContent(res: Response)
     {
-        this.storageHandler.storeNewToken(res, false);
+        if(this.storageHandler !== null && this.storageHandler !== undefined)
+            this.storageHandler.storeNewToken(res, false);
+        return res.json().content || { };
+    }
+    
+    private extractContentAndUpdateToken(res: Response, storageHandler: StorageHandler)
+    {
+        // TODO: ugly workaround, but otherwise this.storageHandler is undefined in createOrUpdate()
+        if(storageHandler !== null && storageHandler !== undefined)
+            storageHandler.storeNewToken(res, false);
         return res.json().content || { };
     }
 
