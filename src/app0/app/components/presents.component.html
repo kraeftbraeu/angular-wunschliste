@@ -1,19 +1,36 @@
 <div class="panel panel-default">
     <div class="panel-heading">
-        Was schenkst du
-        <span *ngIf="selectedUser">{{selectedUser.name}}?</span>
-        <span *ngIf="!selectedUser">...?</span>
+        <span *ngIf="!isChangeFilters">
+            Was schenkst du
+            <span *ngIf="selectedUser">{{selectedUser.name}}?</span>
+            <span *ngIf="!selectedUser">...?</span>
+        </span>
+        <span *ngIf="isChangeFilters">Wen beschenkst du?</span>
     </div>
-    <div class="panel-body">
 
+    <div class="panel-body">
         <ul class="nav nav-tabs">
-            <li role="presentation" *ngFor="let user of otherUsers; let i = index" [ngClass]="user===selectedUser ? 'active' : null">
-                <a class="navbar-link" (click)="clickedUser(user)" [ngClass]="user===selectedUser ? null : 'clickable'">
+            <li role="presentation" *ngFor="let user of otherUsers; let i = index" [ngClass]="{'active': user===selectedUser}" style="white-space:nowrap;">
+                <a (click)="clickedUser(user, isChangeFilters)" class="black" [ngClass]="{
+                    'clickable': isChangeFilters === true || user!==selectedUser, 
+                    'bold': filteredUserIds.indexOf(user.id) !== -1
+                }">
                     {{user.name}}
-                    <span class="badge">{{countPresentsByCurrentUserMap.get(user.id)}}/{{countWishesMap.get(user.id)}}</span>
+                    <span class="badge" *ngIf="!isChangeFilters">{{countPresentsByCurrentUserMap.get(user.id)}}/{{countWishesMap.get(user.id)}}</span>
                 </a>
             </li>
+            <li role="presentation" class="navbar-right"></li>
+            <li role="presentation" class="navbar-right">
+                <button class="btn btn-default" (click)="setChangeFilters()">
+                    <span *ngIf="isChangeFilters">zurück</span>
+                    <span *ngIf="!isChangeFilters">Wichtel setzen</span>
+                </button>
+            </li>
         </ul>
+
+        <div *ngIf="isChangeFilters">
+            <br/>Wähle aus, wen du beschenken willst. Die Auswahl wird gespeichert.
+        </div>
 
         <table class="table table-hover" *ngIf="selectedUser">
             <thead>

@@ -1,1 +1,4 @@
-ng build --app app0 --prod --build-optimizer --environment=prod
+- ng build --app app0 --prod --build-optimizer --environment=prod
+- Dateien aus Verzeichnis dist/ auf Server kopieren
+- Datei dist/[appName]/index.html auf Server kopieren
+- Referenzen in index.html auf .js-Dateien anpassen

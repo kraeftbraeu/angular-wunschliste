@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable } from "rxjs/Rx";
 import { User } from '../data/user';
 import { Wish } from '../data/wish';
 import { Present } from '../data/present';
+import { Filter } from '../data/filter';
 import { RestService } from '../services/rest.service';
 import { AlertService } from '../services/alert.service';
 import { StorageHandler } from '../services/localstorage.service';
@@ -17,6 +18,10 @@ export class PresentsComponent
     allUsers: User[];
     otherUsers: User[];
     selectedUser: User;
+
+    isChangeFilters: boolean;
+    filters: Filter[];
+    filteredUserIds: number[];
 
     selectedUserWishes: Wish[];
     allOtherWishes: Wish[];
@@ -42,6 +47,8 @@ export class PresentsComponent
     {
         this.selectedUser = null;
         this.selectedPresent = null;
+
+        this.isChangeFilters = false;
         
         this.countWishesMap = new Map();
         this.countPresentsByCurrentUserMap = new Map();
@@ -58,12 +65,26 @@ export class PresentsComponent
                 }
                 this.currentUserId = currentUser.id;
 
+                this.restService.readFiltersForGiver(this.currentUserId).subscribe(
+                    filters => {
+                        this.filters = filters
+                        this.filteredUserIds = filters.map(
+                            filter => filter.wisherId
+                        )
+                    },
+                    error => this.alertService.error(error)
+                );
+
                 this.restService.readUsers().subscribe(
                     users => {
                         this.allUsers = users;
                         this.otherUsers = users.filter(
                             user => user.id !== this.currentUserId
-                        );
+                        ).sort((a: User, b: User) => {
+                            if (a.name < b.name) return -1;
+                            else if (a.name > b.name) return 1;
+                            else return 0;
+                        });
 
                         this.restService.readWishes(null).subscribe(
                             wishes => {
@@ -114,20 +135,71 @@ export class PresentsComponent
         );
     }
 
-    clickedUser(user: User)
+    setChangeFilters()
+    {
+        // if change filter, no wishes shall be shown
+        if(this.isChangeFilters !== true)
+        {
+            this.selectedUser = null;
+            this.selectedUserPresents = null;
+            this.selectedUserUnwishedPresents = null;
+            this.selectedUserWishes = null;
+        }
+        this.isChangeFilters = !this.isChangeFilters;
+    }
+
+    clickedUser(user: User, isChangeFilters: boolean)
+    {
+        if(isChangeFilters)
+            this.doSelectFilter(user);
+        else
+            this.doSelectUser(user);
+    }
+    
+    private doSelectFilter(user: User)
+    {
+        console.log(user.id + ": " + user.toJson());
+        let index = this.filteredUserIds.indexOf(user.id);
+        if(index !== -1)
+        {
+            // remove
+            this.restService.delete(this.filters[index]).subscribe(
+                result => {
+                    this.filters.splice(index, 1);
+                    this.filteredUserIds.splice(index, 1);
+                },
+                error => this.alertService.error(error)
+            );
+        }
+        else
+        {
+            // add
+            let newFilter = new Filter(null, this.currentUserId, user.id);
+            this.restService.createOrUpdate(newFilter).subscribe(
+                result => {
+                    newFilter.id = result;
+                    this.filters.push(newFilter);
+                    this.filteredUserIds.push(newFilter.wisherId);
+                },
+                error => this.alertService.error(error)
+            );
+        }
+    }
+
+    private doSelectUser(user)
     {
         this.selectedUser = user;
 
         this.selectedUserPresents = this.allOtherPresents.filter(
-            present => present.wisherId === user.id && present.wishId !== null && present.wishId >= 0
+            present => user && present.wisherId === user.id && present.wishId !== null && present.wishId >= 0
         );
 
         this.selectedUserUnwishedPresents = this.allOtherPresents.filter(
-            present => present.wisherId === user.id && (present.wishId === null || present.wishId < 0)
+            present => user && present.wisherId === user.id && (present.wishId === null || present.wishId < 0)
         );
 
         this.selectedUserWishes = this.allOtherWishes.filter(
-            wish => wish.userId === user.id
+            wish => user && wish.userId === user.id
         );
     }
 

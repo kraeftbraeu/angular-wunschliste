@@ -26,3 +26,17 @@ body {
   border-color: #dc1108 !important;
   background-color: #fff;
 }
+
+.bold {
+  font-weight: 700;
+  color: #599348;
+}
+
+.bold span {
+  background-color: #599348;
+  color: #fff;
+}
+
+a.black {
+  color: #333;
+}
