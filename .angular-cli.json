@@ -10,7 +10,7 @@
             "outDir": "dist",
             "assets": [
                 { "glob": "**/*", "input": "app0/assets/", "output": "./assets/" },
-                { "glob": "favicon.ico", "input": "app0/", "output": "./" },
+                { "glob": "gift.ico", "input": "app0/", "output": "./" },
                 { "glob": "**/*", "input": "shared/assets", "output": "./assets/" }
             ],
             "index": "app0/index.html",
