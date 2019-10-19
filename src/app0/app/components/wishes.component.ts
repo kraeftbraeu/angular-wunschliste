@@ -19,6 +19,7 @@ export class WishesComponent {
 
     currentUserId: number;
     acceptedWishIds: number[];
+    isForceDeletion: boolean;
 
     constructor(
         private restService: RestService,
@@ -26,6 +27,7 @@ export class WishesComponent {
         private storageHandler: StorageHandler)
     {
         this.selectedWish = null;
+        this.isForceDeletion = false;
     }
 
     ngOnInit()
@@ -89,16 +91,18 @@ export class WishesComponent {
 
     clickedRemove(index: number, wish: Wish)
     {
-        if(this.acceptedWishIds.indexOf(wish.id) !== -1)
+        if(!this.isForceDeletion && this.acceptedWishIds.indexOf(wish.id) !== -1)
             this.alertService.error("Dieser Wunsch kann leider nicht mehr gelöscht werden.");
         else
-            this.restService.delete(wish).subscribe(
+        {
+            this.restService.deleteWish(wish, this.isForceDeletion).subscribe(
                 result => {
                     console.log('deleted wish#' + wish.id);
                     this.wishes.splice(index, 1);
                 },
                 error => console.error(error)
             );
+        }
     }
 
     clickedAddNew(event)
@@ -107,5 +111,18 @@ export class WishesComponent {
         this.wishes.push(wish);
         
         this.clickedEdit(wish);
+    }
+
+    clickedTrash(event)
+    {
+        this.alertService.success("In dieser Sicht können Wünsche gelöscht werden, die schon andere Wichtel ausgewählt haben. "
+                                + "Die Wichtel bekommen davon nichts mit, also mit Vorsicht nutzen!", true);
+        this.isForceDeletion = true;
+    }
+
+    clickedResetTrash(event)
+    {
+        this.alertService.success("Das ist wieder die ganz normale Sicht deiner Wünsche.");
+        this.isForceDeletion = false;
     }
 }

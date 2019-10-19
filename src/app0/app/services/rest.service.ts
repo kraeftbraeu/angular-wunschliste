@@ -74,6 +74,17 @@ export class RestService
         return this.http.delete(this.serverUrl + dbObject.getTableName() + "/" + dbObject.id, this.getRequestOptions(false));
     }
 
+    deleteWish(wish: Wish, isForceDeletion: boolean): Observable<any>
+    {
+        if(isForceDeletion)
+            this.http.delete(this.serverUrl + Present.tableName + "/p_wish/" + wish.id, this.getRequestOptions(false))
+                .subscribe(
+                    result => console.log('deleted presents for wish#' + wish.id),
+                    error => console.error(error)
+            );
+        return this.delete(wish);
+    }
+
     private extractContent(res: Response)
     {
         if(this.storageHandler !== null && this.storageHandler !== undefined)

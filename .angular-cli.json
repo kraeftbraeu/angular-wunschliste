@@ -22,14 +22,14 @@
             "testTsconfig": "tsconfig.spec.json",
             "prefix": "app0",
             "styles": [
-              "../node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "../x-bootstrap-3.3.5.min.css",
               "app0/css/sticky-footer.css",
               "app0/css/xmas.css",
               "app0/css/custom.css"
             ],
             "scripts": [
-              "../node_modules/jquery/dist/jquery.slim.min.js",
-              "../node_modules/bootstrap/dist/js/bootstrap.min.js"
+              "../x-jquery-1.11.0.min.js",
+              "../x-bootstrap-3.3.5.min.js"
             ],
             "environmentSource": "app0/environments/environment.ts",
             "environments": {

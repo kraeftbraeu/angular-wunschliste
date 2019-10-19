@@ -5,5 +5,6 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost/php/restservice/'
+  //apiUrl: 'http://localhost/php/restservice/'
+  apiUrl: 'https://mk4-a.srv.sixhop.net/restservice/'
 };
